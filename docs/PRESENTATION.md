@@ -16,23 +16,25 @@
 
 ## Slide overview
 
-| # | Slide | Section | Time |
-|---|---|---|---|
-| 1 | Title | — | 0:30 |
-| 2 | Problem statement / idea | 1 | 1:30 |
-| 3 | Challenge | 1 | 1:30 |
-| 4 | Approach | 1 | 1:30 |
-| 5 | Outcome (expected + status) | 1 | 1:00 |
-| 6 | Research | 2 | 1:00 |
-| 7 | Related work | 2 | 1:30 |
-| 8 | Detailed comparison of three solutions | 2 | 2:00 |
-| 9 | Objectives and limits | 3 | 1:30 |
-| 10 | Sources | 3 | 0:30 |
-| 11 | Tools and technologies | 3 | 1:00 |
-| 12 | Risks | 3 | 1:00 |
-| 13 | Measures of success | 3 | 1:00 |
-| 14 | Schedule and team | — | 0:30 |
-| 15 | Questions | — | — |
+| # | Slide | Section | Time | Speaker |
+|---|---|---|---|---|
+| 1 | Title | — | 0:30 | B |
+| 2 | Problem statement / idea | 1 | 1:30 | B |
+| 3 | Challenge | 1 | 1:30 | B |
+| 4 | Approach | 1 | 1:30 | D |
+| 5 | Outcome (expected + status) + live demo | 1 | 1:00 (+ ~1:00 demo) | D |
+| 6 | Research | 2 | 1:00 | C |
+| 7 | Related work | 2 | 1:30 | C |
+| 8 | Detailed comparison of three solutions | 2 | 2:00 | C |
+| 9 | Objectives and limits | 3 | 1:30 | A |
+| 10 | Sources | 3 | 0:30 | A |
+| 11 | Tools and technologies | 3 | 1:00 | A |
+| 12 | Risks | 3 | 1:00 | A |
+| 13 | Measures of success | 3 | 1:00 | D |
+| 14 | Schedule and team | — | 0:30 | D |
+| 15 | Questions | — | — | everyone, by area |
+
+Speakers use the role letters from [PLAN.md §14](PLAN.md#14-team-organization): **A** Backend & security · **B** Storage & version control · **C** Frontend · **D** DevOps & Azure. Speaking time: A 4:00 · B 3:30 · C 4:30 · D 4:00 + demo. Total is ~16 min plus the demo, so trim slides 7–8 if the run-through goes over.
 
 ---
 
@@ -308,10 +310,10 @@ Sources: [Dropbox version history](https://help.dropbox.com/delete-restore/versi
 
 | Role | Member |
 |---|---|
-| Backend & security | _TBD_ |
-| Storage & version control | _TBD_ |
-| Frontend | _TBD_ |
-| DevOps & Azure | _TBD_ |
+| A — Backend & security | _TBD_ |
+| B — Storage & version control | _TBD_ |
+| C — Frontend | _TBD_ |
+| D — DevOps & Azure | _TBD_ |
 
 ---
 
@@ -325,9 +327,13 @@ Sources: [Dropbox version history](https://help.dropbox.com/delete-restore/versi
 
 ## Checklist before presenting
 
-- [ ] Fill in team names, supervisor and date
-- [ ] Update slide 5 with what actually works
-- [ ] Re-check vendor figures on slides 7–8
-- [ ] Export the Mermaid diagram (slide 4) as an image for the slides
-- [ ] Prepare the live demo **and** a backup screen recording
-- [ ] Time a full run-through (target ~15 min)
+| Task | Owner |
+|---|---|
+| Fill in team names, supervisor and date | A |
+| Build the shared slide deck from this file (one template, everyone fills their own slides) | C |
+| Re-check vendor figures on slides 7–8 | C |
+| Export the Mermaid diagram (slide 4) as an image for the slides | D |
+| Update slide 5 with what actually works (the day before) | D |
+| Prepare the live demo **and** a backup screen recording | D (B checks the storage part) |
+| Have the Azurite prototype output ready as evidence for slide 6 | B |
+| Time a full run-through (target ~15 min); at least two rehearsals | everyone |
