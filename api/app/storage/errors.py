@@ -9,6 +9,13 @@ from __future__ import annotations
 from collections.abc import Iterator
 from contextlib import contextmanager
 
+from azure.core.exceptions import (
+    AzureError,
+    ResourceExistsError,
+    ResourceModifiedError,
+    ResourceNotFoundError,
+)
+
 
 class StorageError(Exception):
     """Base class for all errors raised by the storage package."""
@@ -38,8 +45,18 @@ def translate_azure_errors() -> Iterator[None]:
 
     ``ResourceNotFoundError`` → ``BlobNotFound``,
     ``ResourceExistsError``   → ``BlobAlreadyExists``,
+    ``ResourceModifiedError`` → ``BlobAlreadyExists`` (the only conditions this
+    package sends are "the target must not exist yet"),
     any other ``AzureError``  → ``StorageError``.
 
+    The original Azure exception stays attached as ``__cause__`` for logging.
     Internal to the package; not re-exported.
     """
-    raise NotImplementedError
+    try:
+        yield
+    except ResourceNotFoundError as e:
+        raise BlobNotFound(e.message) from e
+    except (ResourceExistsError, ResourceModifiedError) as e:
+        raise BlobAlreadyExists(e.message) from e
+    except AzureError as e:
+        raise StorageError(e.message) from e

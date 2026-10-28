@@ -15,18 +15,14 @@ Everything public is re-exported here, so callers only ever write::
     await storage.upload_stream(...)
 
 Package layout:
-    settings.py  StorageSettings
+    settings.py  StorageSettings, CHUNK_SIZE
     models.py    UploadResult, Download
     errors.py    StorageError and its subclasses
     client.py    init_storage, close_storage (shared Blob client)
     blobs.py     blob operations
-
-Status: interface only. Every function except ``blob_name`` raises
-``NotImplementedError`` until it is implemented.
 """
 
 from .blobs import (
-    CHUNK_SIZE,
     blob_name,
     copy_blob,
     delete_blob,
@@ -37,7 +33,7 @@ from .blobs import (
 from .client import close_storage, init_storage
 from .errors import BlobAlreadyExists, BlobNotFound, FileTooLarge, StorageError
 from .models import Download, UploadResult
-from .settings import StorageSettings
+from .settings import CHUNK_SIZE, StorageSettings
 
 __all__ = [
     # Configuration and lifecycle

@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
+CHUNK_SIZE = 4 * 1024 * 1024  # bytes per chunk when streaming (4 MiB)
+
 
 @dataclass(frozen=True)
 class StorageSettings:
