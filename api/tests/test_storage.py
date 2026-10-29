@@ -1,8 +1,9 @@
 """Integration tests for app.storage against a real Azurite (no mocks).
 
-Run from the api/ folder with Azurite listening on 127.0.0.1:10000:
+Install once from the api/ folder with ``pip install -e ".[dev]"``, then run with
+Azurite listening on 127.0.0.1:10000:
 
-    python -m pytest tests/test_storage.py
+    python -m pytest
 
 Set BLOB_CONNECTION_STRING to test against another Azurite (e.g. host ``azurite``
 inside Docker Compose). Each test gets its own random container, deleted at the end.

@@ -1,0 +1,24 @@
+Azurite blob versioning / soft delete check
+Date:        2026-10-29 01:30:19 UTC
+Endpoint:    http://127.0.0.1:10000/devstoreaccount1/
+Server:      Azurite-Blob/3.37.0
+Python SDK:  azure-storage-blob 12.31.0
+
+1. Blob versioning
+   upload 'version 1' -> version_id = None
+   upload 'version 2' -> version_id = None
+   download now returns b'version 2'
+   list_blobs(include=versions) -> 1 entry(ies):
+     demo.txt  version_id=None
+
+2. Soft delete
+   enable 7-day delete retention -> accepted, reads back enabled=True
+   delete demo.txt -> done
+   list_blobs(include=deleted) -> deleted blobs: []
+   undelete demo.txt -> HttpResponseError: Current API is not implemented yet. Please vote your wanted features to https://github.com/azure/azurite/issues
+
+Result
+   Old content kept after overwrite (versioning): NO
+   Deleted blob can be restored (soft delete):    NO
+   -> Versioning must be implemented in our own code: every version is a
+      new, never-modified blob {file_id}/{version_no} (docs/PLAN.md §3).
