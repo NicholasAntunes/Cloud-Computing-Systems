@@ -203,6 +203,7 @@ Cloud-Computing-Systems/
 └── docs/
     ├── PLAN.md
     ├── PRESENTATION.md
+    ├── storage.md           # storage package: layout, UML, errors
     ├── evidence/            # saved outputs of the scripts in api/scripts/
     └── report/
 ```
