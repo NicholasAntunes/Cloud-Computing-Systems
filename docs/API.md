@@ -216,12 +216,43 @@ One function that every call goes through, so Phase 2 only changes this file:
 ```ts
 let accessToken: string | null = null;
 
+// Login, refresh and logout must never trigger a refresh-and-retry themselves.
+const NO_RETRY = ['/api/auth/login', '/api/auth/refresh', '/api/auth/logout'];
+
+export async function login(username: string, password: string): Promise<User> {
+  const res = await apiFetch('/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  });
+  const body = await res.json();
+  accessToken = body.access_token;
+  return body.user;
+}
+
+// Call on page load too: returns the user if the refresh cookie is still valid, otherwise null.
+export async function refresh(): Promise<User | null> {
+  const res = await fetch('/api/auth/refresh', { method: 'POST' });
+  if (!res.ok) {
+    accessToken = null;
+    return null;
+  }
+  const body = await res.json();
+  accessToken = body.access_token;
+  return body.user;
+}
+
+export async function logout(): Promise<void> {
+  await apiFetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+  accessToken = null;
+}
+
 export async function apiFetch(path: string, init: RequestInit = {}, retried = false): Promise<Response> {
   const headers = new Headers(init.headers);
   if (accessToken) headers.set('Authorization', `Bearer ${accessToken}`);
   const res = await fetch(path, { ...init, headers });
 
-  if (res.status === 401 && !retried && !path.startsWith('/api/auth/')) {
+  if (res.status === 401 && !retried && !NO_RETRY.includes(path)) {
     if (await refresh()) return apiFetch(path, init, true);
   }
   if (!res.ok) throw await res.json().then(b => b.error).catch(() => ({ code: 'INTERNAL_ERROR', message: res.statusText }));
