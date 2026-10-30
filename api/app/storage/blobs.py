@@ -15,7 +15,6 @@ from azure.storage.blob.aio import StorageStreamDownloader
 from .client import get_container
 from .errors import FileTooLarge, StorageError, translate_azure_errors
 from .models import Download, UploadResult
-from .settings import CHUNK_SIZE
 
 _DEFAULT_CONTENT_TYPE = "application/octet-stream"
 _COPY_POLL_SECONDS = 0.2

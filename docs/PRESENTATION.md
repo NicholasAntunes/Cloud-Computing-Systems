@@ -93,6 +93,8 @@ Point 3 came out of our research: the obvious solution (turn on Azure Blob versi
 
 **On the slide**
 
+![Architecture Diagram](assets/architecture.png)
+
 ```mermaid
 flowchart LR
   subgraph Clients["Clients (responsive web app)"]

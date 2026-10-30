@@ -24,6 +24,7 @@ USER app
 
 EXPOSE 8000
 
-# Migrate, then serve. --proxy-headers: take the client address from Caddy's
-# X-Forwarded-For, trusted only from the IPs in FORWARDED_ALLOW_IPS (default 127.0.0.1).
-CMD ["sh", "-c", "alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers"]
+# Serve. --proxy-headers: take the client address from Caddy's X-Forwarded-For,
+# trusted only from the IPs in FORWARDED_ALLOW_IPS (default 127.0.0.1).
+# TODO(task 3): run `alembic upgrade head &&` first once migrations exist.
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]

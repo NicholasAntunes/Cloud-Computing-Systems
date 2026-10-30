@@ -13,7 +13,7 @@ Days are counted back from the presentation day (P).
 |---|---|---|
 | Day 1 | Agree the JSON shapes of the file endpoints with **A** ([PLAN §7](../PLAN.md#7-rest-api)) | Example responses in an issue |
 | Day 1 | Start the shared slide deck from [PRESENTATION.md](../PRESENTATION.md): one template, each speaker fills their own slides | Deck shared with the team |
-| By P−5 | `web/`: Vite + React + TypeScript scaffold and `web/Dockerfile`; page with file list, upload button and download links, built against a fake API | Page works with mocked data |
+| By P−5 | Create the React + Vite + TypeScript app inside `web/` (including `package.json`, `vite.config.ts` and `web/Dockerfile`); implement upload, file listing and download through the agreed `/api/files` contract, using mock data during development | Page works with mocked data |
 | By P−3 | Connect the page to the real API through `https://localhost` | Upload → list → download works in the browser |
 | By P−3 | Responsive layout | Usable at phone width (375 px) in browser dev tools |
 | By P−3 | Re-check the vendor figures on slides 7–8 (Dropbox, OneDrive, Nextcloud, Google Drive) | Figures and check date updated in PRESENTATION.md |
@@ -43,6 +43,9 @@ In Q&A, take questions on: competing products, why we chose these three, the use
 | 7 — Report | User guide with screenshots (collect them after every feature); final presentation deck |
 
 ## Works with
+
+For Vite development behind Caddy, configure the dev server to accept external
+hosts: `server: { host: '0.0.0.0', port: 5173, allowedHosts: true }`.
 
 - **A:** API contract, login and token flow.
 - **B:** version history and LogBook endpoints.
