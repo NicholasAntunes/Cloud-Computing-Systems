@@ -12,17 +12,39 @@ dependencies = [
     "azure-storage-blob>=12.31,<13",
     "azure-identity>=1.27,<2",
     "aiohttp>=3.14,<4",
+    # Web framework. python-multipart parses the upload form (UploadFile).
+    "fastapi>=0.162,<1",
+    "uvicorn[standard]>=0.54,<1",
+    "python-multipart>=0.0.32,<0.1",
+    "pydantic-settings>=2.16,<3",
+    # Database: async SQLAlchemy on psycopg 3, migrations with Alembic.
+    "sqlalchemy[asyncio]>=2.1,<3",
+    "psycopg[binary]>=3.3,<4",
+    "alembic>=1.20,<2",
+    # Password hashing (Argon2id).
+    "argon2-cffi>=25.1",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=9.2",
     "pytest-asyncio>=1.4",
+    "httpx>=0.28,<1",
+    "ruff>=0.14",
 ]
 
 [tool.setuptools.packages.find]
 include = ["app*"]
 namespaces = true
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+# B's code predates this config; remove once B has run `ruff check --fix` and `ruff format`.
+extend-exclude = ["app/storage", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

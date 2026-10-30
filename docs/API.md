@@ -82,7 +82,7 @@ Returned by login, refresh and `GET /api/auth/me`.
 
 ### List — `GET /api/files?limit=100&offset=0`
 
-Returns only files the user may read, newest `updated_at` first. `limit` defaults to 100 (max 1000).
+Returns only files the user may read, newest `updated_at` first. `limit` defaults to 100 and must be 1–1000; `offset` defaults to 0. Out of range → `400` `VALIDATION_ERROR`.
 
 ```json
 200 OK
@@ -201,11 +201,13 @@ Every error has the same body:
 | 401 | `TOKEN_EXPIRED` | Access token expired or invalid → refresh and retry |
 | 401 | `INVALID_CREDENTIALS` | Login failed |
 | 403 | `FORBIDDEN` | The user can see the file but lacks this right (e.g. UPDATE) |
-| 404 | `NOT_FOUND` | The file doesn't exist **or the user may not read it**. We don't reveal that a file exists |
+| 404 | `NOT_FOUND` | The file doesn't exist **or the user may not read it**. We don't reveal that a file exists. Also for a malformed ID and an unknown route |
+| 405 | `METHOD_NOT_ALLOWED` | The route exists, but not with this HTTP method |
 | 409 | `CONFLICT` | Simultaneous new versions; retry |
 | 413 | `FILE_TOO_LARGE` | Over `MAX_UPLOAD_MB` |
 | 429 | `RATE_LIMITED` | Too many login attempts |
 | 500 | `INTERNAL_ERROR` | Anything unexpected; generic message |
+| 503 | `STORAGE_UNAVAILABLE` | Blob Storage can't be reached or failed; retry later |
 
 Successful responses use `200 OK`, `201 Created` (upload, new version, restore) and `204 No Content` (logout, delete).
 

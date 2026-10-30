@@ -1,0 +1,7 @@
+# Allow-list: only what the image needs. Keeps .env (secrets), .venv, tests and caches out.
+*
+!pyproject.toml
+!app/
+!alembic.ini
+!migrations/
+**/__pycache__
