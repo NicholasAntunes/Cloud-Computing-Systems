@@ -76,9 +76,9 @@ async function errorFromResponse(response: Response): Promise<ApiError> {
     if (typeof body === 'object' && body !== null && 'code' in body && 'message' in body) {
       return body as ApiError;
     }
-    return createApiError('INTERNAL_ERROR', `Richiesta non riuscita (${response.status}).`, body);
+    return createApiError('INTERNAL_ERROR', `Request failed (${response.status}).`, body);
   } catch {
-    return createApiError('INTERNAL_ERROR', response.statusText || 'Errore imprevisto del server.');
+    return createApiError('INTERNAL_ERROR', response.statusText || 'Unexpected server error.');
   }
 }
 
@@ -114,10 +114,10 @@ export async function fetchFiles(): Promise<FileListResponse> {
 
 export async function uploadFile(file: File): Promise<FileItem> {
   if (file.size > MAX_FILE_SIZE) {
-    throw createApiError('FILE_TOO_LARGE', 'Il file supera il limite consentito di 100 MB.');
+    throw createApiError('FILE_TOO_LARGE', 'The file exceeds the 100 MB upload limit.');
   }
   if (file.size === 0) {
-    throw createApiError('VALIDATION_ERROR', 'Non è possibile caricare un file vuoto.');
+    throw createApiError('VALIDATION_ERROR', 'Empty files cannot be uploaded.');
   }
 
   if (MOCK_MODE) {
@@ -149,7 +149,7 @@ export async function downloadFile(file: FileItem): Promise<void> {
   let blob: Blob;
   if (MOCK_MODE) {
     await mockDelay();
-    blob = new Blob([`Contenuto dimostrativo di ${file.name}`], { type: file.content_type });
+    blob = new Blob([`Demo content for ${file.name}`], { type: file.content_type });
   } else {
     const response = await apiFetch(`/api/files/${encodeURIComponent(file.id)}/download`);
     blob = await response.blob();

@@ -152,10 +152,10 @@ td { height: 72px; padding: 9px 16px; border-top: 1px solid #f0f2f0; color: #344
   tbody td:first-child { grid-column: 1 / -1; padding: 0 0 12px; }
   .file-name-cell { gap: 10px; }
   .file-icon { width: 33px; height: 36px; }
-  tbody td[data-label='Ultima modifica'], tbody td[data-label='Dimensione'], tbody td[data-label='Versione'] { display: inline-flex; align-items: center; padding: 0 8px 0 0; color: #7f8a82; font-size: 10px; }
-  tbody td[data-label='Ultima modifica']::before { content: 'Mod. '; color: #9aa29d; }
-  tbody td[data-label='Dimensione']::before { content: '· '; padding-right: 4px; }
-  tbody td[data-label='Versione'] { display: none; }
+  tbody td[data-label='Last modified'], tbody td[data-label='Size'], tbody td[data-label='Version'] { display: inline-flex; align-items: center; padding: 0 8px 0 0; color: #7f8a82; font-size: 10px; }
+  tbody td[data-label='Last modified']::before { content: 'Edited '; color: #9aa29d; }
+  tbody td[data-label='Size']::before { content: '· '; padding-right: 4px; }
+  tbody td[data-label='Version'] { display: none; }
   tbody td.action-cell { position: absolute; right: 14px; bottom: 12px; }
   .button-download { min-height: 30px; padding: 0 8px; font-size: 10px; }
   .table-message { display: block; height: auto; padding: 28px 8px; line-height: 1.6; }
