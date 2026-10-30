@@ -16,7 +16,8 @@ jobs:
         image: mcr.microsoft.com/azure-storage/azurite:latest
         ports:
           - 10000:10000
-        options: --skipApiVersionCheck
+        env:
+          AZURITE_SKIP_API_VERSION_CHECK: "true"
 
       postgres:
         image: postgres:16
@@ -40,8 +41,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: "pip"
-          cache-dependency-path: "api/pyproject.toml"
 
       - name: Install dependencies & lint tools
         run: |
@@ -80,8 +79,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "npm"
-          cache-dependency-path: "web/package-lock.json"
 
       - name: Install frontend dependencies
         if: hashFiles('web/package.json') != ''

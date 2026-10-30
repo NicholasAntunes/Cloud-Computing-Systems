@@ -12,10 +12,10 @@ Days are counted back from the presentation day (P).
 | When | Task | Done when |
 |---|---|---|
 | Day 1 | Confirm the backend stack with the team (FastAPI by default, [PLAN §15](../PLAN.md#15-open-decisions)) | Decision written in PLAN.md |
-| Day 1 | Agree the `storage.py` function signatures with **B** | Signatures in a short comment or issue that both of you approve |
+| Day 1 | Agree the `app/storage` function signatures with **B** | Signatures in a short comment or issue that both of you approve |
 | Day 1 | Agree the JSON shapes of the file endpoints with **C** ([PLAN §7](../PLAN.md#7-rest-api)) | Example responses in an issue, so C can build against a fake API |
 | By P−5 | FastAPI skeleton: `api/app/main.py`, `config.py` (all settings from environment variables), `db.py`, minimal `files` table, `api/Dockerfile`, `pyproject.toml` | `docker compose up` starts the API; `/docs` loads |
-| By P−3 | `POST /api/files`, `GET /api/files`, `GET /api/files/{id}/download` using B's `storage.py` | Upload → list → download works through Swagger UI |
+| By P−3 | `POST /api/files`, `GET /api/files`, `GET /api/files/{id}/download` using B's `app/storage` | Upload → list → download works through Swagger UI |
 | By P−3 | Enforce `MAX_UPLOAD_MB` while streaming; never read the whole file into memory | A file over the limit gets `413`, and memory stays flat |
 | By P−2 | Smoke tests (pytest + httpx) for the three endpoints | Tests pass in D's CI |
 | P−1 | Timed run-through with the team | — |
@@ -47,7 +47,7 @@ In Q&A, take questions on: authentication, JWT and logout, rights, password hash
 
 ## Works with
 
-- **B:** `storage.py` interface; B's endpoints reuse your permission dependency.
+- **B:** `app/storage` interface; B's endpoints reuse your permission dependency.
 - **C:** API contract, token handling in the browser.
 - **D:** environment variables, CI, Key Vault secrets.
 - Review **B**'s and **C**'s pull requests that touch the API.

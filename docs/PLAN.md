@@ -191,17 +191,20 @@ Cloud-Computing-Systems/
 │   │   ├── config.py        # all settings from environment variables
 │   │   ├── db.py
 │   │   ├── models.py
-│   │   ├── storage.py       # the only module that talks to Blob Storage
+│   │   ├── storage/         # the only package that talks to Blob Storage
 │   │   ├── auth/            # login, logout, tokens, permission dependency
 │   │   ├── files/           # upload, download, list, versions
 │   │   └── logbook/         # logging service, admin endpoints, export
 │   ├── migrations/          # Alembic
+│   ├── scripts/             # one-off checks, e.g. the Azurite versioning evidence
 │   └── tests/
 ├── web/                     # React + TypeScript (Vite)
 ├── infra/                   # Azure deployment scripts (Bicep or az CLI)
 └── docs/
     ├── PLAN.md
     ├── PRESENTATION.md
+    ├── storage.md           # storage package: layout, UML, errors
+    ├── evidence/            # saved outputs of the scripts in api/scripts/
     └── report/
 ```
 
@@ -273,7 +276,7 @@ localhost {
 | `MAX_UPLOAD_MB` | `100` | `100` |
 | `CORS_ORIGINS` | `https://localhost` | Static Web App URL |
 
-`storage.py` builds the client from these settings:
+The `storage` package (`app/storage/client.py`) builds the client from these settings:
 - `connection_string` → `BlobServiceClient.from_connection_string(...)`
 - `managed_identity` → `BlobServiceClient(account_url, credential=DefaultAzureCredential())`
 
@@ -321,7 +324,7 @@ gantt
 - [ ] Azure Storage Explorer installed and connected to Azurite
 
 ### Phase 1 — First working version (W2–W3) · Necessary
-- [ ] `storage.py`: create container, upload (streamed), download (streamed), list
+- [ ] `app/storage`: create container, upload (streamed), download (streamed), list
 - [ ] `POST /api/files`, `GET /api/files`, `GET /api/files/{id}/download`
 - [ ] Minimal web page: file list, upload button, download links
 - [ ] Everything reachable only via `https://localhost`
@@ -430,7 +433,7 @@ The Container Apps consumption plan includes 180,000 vCPU-seconds, 360,000 GiB-s
 | | Role | Responsibilities | Member |
 |---|---|---|---|
 | **A** | Backend & security | API skeleton, auth, rights, tokens, security review | _TBD_ |
-| **B** | Storage & version control | `storage.py`, versioning, LogBook | _TBD_ |
+| **B** | Storage & version control | `app/storage`, versioning, LogBook | _TBD_ |
 | **C** | Frontend | Web app, responsive layout, user guide screenshots | _TBD_ |
 | **D** | DevOps & Azure | Docker, CI, Azure deployment, cost monitoring | _TBD_ |
 
@@ -444,9 +447,9 @@ The presentation moved up, so Phase 0 and Phase 1 are compressed into one week. 
 
 | When | A — Backend & security | B — Storage & version control | C — Frontend | D — DevOps & Azure |
 |---|---|---|---|---|
-| **Day 1** (kick-off) | Confirm the stack (§15); agree the `storage.py` function signatures with B | Agree `storage.py` signatures with A; Azure Storage Explorer connected to Azurite | Agree the API response shapes for §7 file endpoints with A; start the slide deck template | Protected `main`, Projects board with these tasks, `.gitignore` fix, `.env.example` |
-| **By P−5** | FastAPI skeleton: `main.py`, `config.py`, `db.py`, minimal `files` table | `storage.py`: create container, streamed upload / download, list | Vite + React + TS scaffold; list / upload / download page against a mocked API | `docker-compose.yml` (Azurite, PostgreSQL, API, web, Caddy) + `Caddyfile`; everyone can run it |
-| **By P−3** | `POST /api/files`, `GET /api/files`, `GET /api/files/{id}/download`, `MAX_UPLOAD_MB` enforced while streaming | Wire `storage.py` into A's endpoints; Azurite prototype proving no blob versioning (slide 6 evidence) | Page connected to the real API; works on phone width | GitHub Actions: lint + tests with PostgreSQL and Azurite service containers; Azure for Students + budget alert |
+| **Day 1** (kick-off) | Confirm the stack (§15); agree the `app/storage` function signatures with B | Agree `app/storage` signatures with A; Azure Storage Explorer connected to Azurite | Agree the API response shapes for §7 file endpoints with A; start the slide deck template | Protected `main`, Projects board with these tasks, `.gitignore` fix, `.env.example` |
+| **By P−5** | FastAPI skeleton: `main.py`, `config.py`, `db.py`, minimal `files` table | `app/storage`: create container, streamed upload / download, list | Vite + React + TS scaffold; list / upload / download page against a mocked API | `docker-compose.yml` (Azurite, PostgreSQL, API, web, Caddy) + `Caddyfile`; everyone can run it |
+| **By P−3** | `POST /api/files`, `GET /api/files`, `GET /api/files/{id}/download`, `MAX_UPLOAD_MB` enforced while streaming | Wire `app/storage` into A's endpoints; Azurite prototype proving no blob versioning (slide 6 evidence) | Page connected to the real API; works on phone width | GitHub Actions: lint + tests with PostgreSQL and Azurite service containers; Azure for Students + budget alert |
 | **By P−2** | Smoke tests for the three endpoints | Tests: upload → download returns identical bytes (SHA-256) | Screenshots for slide 5 and the user guide | End-to-end demo over `https://localhost`; backup screen recording; diagram exported |
 | **Slides** | 9–12 | 1–3 | 6–8 + deck assembly | 4–5 (+ live demo), 13–14 |
 | **P−1** | Timed run-through (all) | Timed run-through (all) | Timed run-through (all) | Timed run-through (all); update slide 5 with what actually works |
