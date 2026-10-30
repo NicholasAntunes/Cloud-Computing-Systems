@@ -1,0 +1,56 @@
+version: "3.8"
+
+services:
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:latest
+    command: azurite-blob --blobHost 0.0.0.0 --location /data --skipApiVersionCheck
+    ports:
+      - "10000:10000" # Azure Storage Explorer
+    volumes:
+      - azurite-data:/data
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-cloudfiles}
+      POSTGRES_USER: ${POSTGRES_USER:-cloudfiles}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cloudfiles_dev_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - azurite
+      - db
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    depends_on:
+      - api
+      - web
+
+volumes:
+  azurite-data:
+  db-data:
+  caddy-data:

@@ -1,0 +1,10 @@
+flowchart LR
+  subgraph Clients["Clients (responsive web app)"]
+    PC[Computer]
+    TAB[Tablet]
+    PH[Smartphone]
+  end
+  PC & TAB & PH -->|HTTPS| TLS["TLS termination<br/>(Caddy locally · Azure ingress in cloud)"]
+  TLS --> API["REST API<br/>(Python · FastAPI)"]
+  API -->|Azure Blob SDK| BLOB[("Blob Storage<br/>(Azurite → Azure Blob)")]
+  API -->|SQL| DB[("PostgreSQL<br/>(users · rights · versions · LogBook)")]

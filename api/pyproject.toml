@@ -28,3 +28,12 @@ namespaces = true
 testpaths = ["tests"]
 pythonpath = ["."]
 asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["RUF022"]
+
