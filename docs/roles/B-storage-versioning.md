@@ -11,10 +11,10 @@ Days are counted back from the presentation day (P).
 
 | When | Task | Done when |
 |---|---|---|
-| Day 1 | Agree the `storage.py` function signatures with **A** | Signatures in a short comment or issue that both of you approve |
+| Day 1 | Agree the `app/storage` function signatures with **A** | Signatures in a short comment or issue that both of you approve |
 | Day 1 | Install Azure Storage Explorer and connect it to Azurite | You can see the `files` container |
-| By P−5 | `api/app/storage.py`: create the container, streamed upload, streamed download, list. Build the client from `STORAGE_AUTH` (connection string locally, managed identity on Azure, [PLAN §9](../PLAN.md#9-local-environment)) | Works against Azurite from inside Compose (host `azurite`, not `127.0.0.1`) |
-| By P−3 | Wire `storage.py` into A's endpoints. Blob names are `{file_id}/{version_no}`, never the user's file name | Upload through the API shows up in Storage Explorer |
+| By P−5 | `api/app/storage/` package: create the container, streamed upload, streamed download, list. Build the client from `STORAGE_AUTH` (connection string locally, managed identity on Azure, [PLAN §9](../PLAN.md#9-local-environment)) | Works against Azurite from inside Compose (host `azurite`, not `127.0.0.1`) |
+| By P−3 | Wire `app/storage` into A's endpoints. Blob names are `{file_id}/{version_no}`, never the user's file name | Upload through the API shows up in Storage Explorer |
 | By P−3 | Small Azurite test that shows blob versioning is **not** supported | Script and its output saved — evidence for slide 6 |
 | By P−2 | Test: upload → download returns identical bytes (same SHA-256) | Test passes in D's CI |
 | P−1 | Timed run-through with the team | — |
@@ -45,7 +45,7 @@ In Q&A, take questions on: Blob Storage, Azurite, versioning design, simultaneou
 
 ## Works with
 
-- **A:** `storage.py` interface; A's permission dependency on your endpoints.
+- **A:** `app/storage` interface; A's permission dependency on your endpoints.
 - **C:** version history panel and LogBook admin page.
 - **D:** Azurite in Compose and CI; managed identity and storage account on Azure.
 - Review **A**'s pull requests.
