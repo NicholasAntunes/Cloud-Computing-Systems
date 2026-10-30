@@ -1,0 +1,13 @@
+localhost {
+    tls internal
+
+    # Forward API requests to the FastAPI backend
+    handle /api/* {
+        reverse_proxy api:8000
+    }
+
+    # Forward all other requests to the web frontend
+    handle {
+        reverse_proxy web:5173
+    }
+}
