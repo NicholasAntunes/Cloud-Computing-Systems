@@ -9,7 +9,7 @@
 |---|---|
 | Base path | `/api`, always called **relative** (`fetch('/api/files')`). The web app and the API share one origin behind Caddy, so no CORS and the refresh cookie just works |
 | Format | JSON, `snake_case` field names (except uploads and downloads) |
-| Dates | ISO 8601 in UTC with `Z`, e.g. `"2026-11-02T14:05:31Z"` |
+| Dates | ISO 8601 in UTC with `Z`, to the second, e.g. `"2026-11-02T14:05:31Z"` |
 | IDs | Files: UUID string. Users: integer |
 | Sizes | Bytes, as integers (`size_bytes`) |
 | Auth (from Phase 2) | `Authorization: Bearer <access_token>` on every request except login and refresh |
@@ -102,7 +102,7 @@ await apiFetch('/api/files', { method: 'POST', body: form });
 | Result | Response |
 |---|---|
 | Success | `201 Created`, body: File (with `current_version: 1`) |
-| No `file` field / empty file | `400` `VALIDATION_ERROR` |
+| No `file` field / empty file / file name empty or over 255 characters | `400` `VALIDATION_ERROR` |
 | Over 100 MB | `413` `FILE_TOO_LARGE` |
 | No WRITE right (Phase 2) | `403` `FORBIDDEN` |
 
@@ -114,6 +114,7 @@ await apiFetch('/api/files', { method: 'POST', body: form });
 
 - Response: the file bytes with `Content-Type` and `Content-Disposition: attachment; filename="holiday.jpg"` (UTF-8 names via `filename*=`).
 - Without `version` you get the current version.
+- Unknown or deleted file, or no such version → `404` `NOT_FOUND`. `version` below 1 or not a number → `400` `VALIDATION_ERROR`.
 - From Phase 2 a plain `<a href>` can't send the Bearer header, so download with `fetch` → `blob()` → object URL:
 
 ```js

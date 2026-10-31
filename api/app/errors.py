@@ -69,8 +69,14 @@ async def _api_error(request: Request, exc: ApiError) -> JSONResponse:
 
 
 async def _validation_error(request: Request, exc: RequestValidationError) -> JSONResponse:
+    errors = exc.errors()
+    # A path that doesn't parse (e.g. /api/files/not-a-uuid) names nothing that
+    # exists: 404 like an unknown ID (docs/API.md), not 400.
+    if any(err["loc"] and err["loc"][0] == "path" for err in errors):
+        code, message = _HTTP_ERRORS[404]
+        return error_response(404, code, message)
     details = []
-    for err in exc.errors():
+    for err in errors:
         loc = list(err["loc"])
         if len(loc) > 1 and loc[0] in _LOCATIONS:
             loc = loc[1:]

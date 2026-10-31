@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app import auth, db, storage
+from app import auth, db, files, storage
 from app.config import Settings
 from app.errors import install_error_handlers
 
@@ -47,6 +47,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         openapi_url="/api/openapi.json",
     )
     install_error_handlers(app)
+    app.include_router(files.router)
 
     @app.get("/api/health", tags=["health"])
     async def health() -> dict[str, str]:
