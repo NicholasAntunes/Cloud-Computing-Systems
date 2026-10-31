@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app import db, storage
+from app import auth, db, storage
 from app.config import Settings
 from app.errors import install_error_handlers
 
@@ -31,6 +31,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.settings = app_settings
         app.state.sessionmaker = db.create_sessionmaker(engine)
         try:
+            await auth.ensure_admin(app.state.sessionmaker, app_settings)
             yield
         finally:
             await engine.dispose()

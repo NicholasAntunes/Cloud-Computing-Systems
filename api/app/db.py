@@ -23,9 +23,14 @@ def create_engine(settings: Settings) -> AsyncEngine:
     """Create the async engine. No connection is opened until the first query.
 
     ``pool_pre_ping`` replaces connections the database closed in the meantime
-    (e.g. after a PostgreSQL restart).
+    (e.g. after a PostgreSQL restart). ``TimeZone=UTC`` makes PostgreSQL return
+    every ``timestamptz`` in UTC, whatever the server's own time zone is.
     """
-    return create_async_engine(settings.database_url, pool_pre_ping=True)
+    return create_async_engine(
+        settings.database_url,
+        pool_pre_ping=True,
+        connect_args={"options": "-c TimeZone=UTC"},
+    )
 
 
 def create_sessionmaker(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:

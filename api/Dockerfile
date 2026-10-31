@@ -15,8 +15,8 @@ RUN python -c "import tomllib; print('\n'.join(tomllib.load(open('pyproject.toml
     && pip install -r /tmp/requirements.txt \
     && rm /tmp/requirements.txt
 
-# Code (and, once they exist, alembic.ini and migrations/). Owned by root, so the
-# app user below can read it but not change it.
+# Code, alembic.ini and migrations/ (see .dockerignore). Owned by root, so the app
+# user below can read it but not change it.
 COPY . .
 
 RUN useradd --system --uid 10001 --no-create-home app

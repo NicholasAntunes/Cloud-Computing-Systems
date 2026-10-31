@@ -1,4 +1,4 @@
-"""Task 3 (database): tables as in PLAN §6 and the admin seeded at startup.
+"""Task 3 (database): tables as in PLAN §6, the admin seeded at startup, ``current_user``.
 
 The tables are created from ``app.models.Base`` (see conftest.py); the Alembic
 migration itself is checked by hand with ``alembic upgrade head``.
@@ -6,8 +6,14 @@ migration itself is checked by hand with ``alembic upgrade head``.
 
 from __future__ import annotations
 
+from typing import Annotated
+
 import pytest
+from fastapi import Depends
 from helpers import ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_USERNAME
+
+from app.auth import current_user
+from app.models import User
 
 # Columns from docs/PLAN.md §6. Extra columns are allowed.
 PLAN_COLUMNS = {
@@ -120,3 +126,22 @@ async def test_no_admin_seeded_when_users_exist(make_client, db):
     async with make_client(admin_username="someone-else", admin_password="other"):
         pass
     assert [r["username"] for r in db("SELECT username FROM users")] == [ADMIN_USERNAME]
+
+
+# --- current user (Phase 1: always the admin) --------------------------------
+
+
+@pytest.mark.asyncio
+async def test_current_user_is_the_admin(make_client, db):
+    # FastAPI resolves the string annotations (``from __future__``) in this module's
+    # globals, so Annotated, Depends, current_user and User are imported at the top.
+    def configure(app):
+        @app.get("/api/test/me")
+        async def me(user: Annotated[User, Depends(current_user)]):
+            return {"id": user.id, "username": user.username}
+
+    async with make_client(configure=configure) as client:
+        r = await client.get("/api/test/me")
+    assert r.status_code == 200, r.text
+    admin_id = db("SELECT id FROM users")[0]["id"]
+    assert r.json() == {"id": admin_id, "username": ADMIN_USERNAME}
