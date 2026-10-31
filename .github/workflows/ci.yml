@@ -22,7 +22,9 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_DB: cloudfiles
+          # The API tests drop and recreate tables, so they refuse any database
+          # whose name doesn't end in _test (api/tests/conftest.py).
+          POSTGRES_DB: cloudfiles_test
           POSTGRES_USER: cloudfiles
           POSTGRES_PASSWORD: cloudfiles_dev_password
         ports:
@@ -63,7 +65,9 @@ jobs:
           STORAGE_AUTH: connection_string
           BLOB_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
           BLOB_CONTAINER: files
-          DATABASE_URL: "postgresql+psycopg://cloudfiles:cloudfiles_dev_password@127.0.0.1:5432/cloudfiles"
+          # The tests connect with TEST_DATABASE_URL (api/tests/helpers.py), not DATABASE_URL.
+          TEST_DATABASE_URL: "postgresql+psycopg://cloudfiles:cloudfiles_dev_password@127.0.0.1:5432/cloudfiles_test"
+          DATABASE_URL: "postgresql+psycopg://cloudfiles:cloudfiles_dev_password@127.0.0.1:5432/cloudfiles_test"
         run: |
           cd api && python -m pytest -v
 
