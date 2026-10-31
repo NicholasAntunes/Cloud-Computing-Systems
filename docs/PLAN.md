@@ -173,7 +173,7 @@ logbook          (id, ts, user_id, username, action, file_id, version_no,
 | GET | `/api/logbook/export?format=csv\|json` | admin | — |
 | POST | `/api/users` | admin | `USER_CREATE` |
 
-FastAPI generates the OpenAPI spec and a Swagger UI at `/docs`. We use them for testing and demos.
+FastAPI generates the OpenAPI spec and a Swagger UI at `/api/docs`. We use them for testing and demos.
 
 ## 8. Repository layout (target)
 

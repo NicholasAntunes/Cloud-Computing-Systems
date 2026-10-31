@@ -101,6 +101,24 @@ async def test_upload_empty_file(client, db):
 
 
 @pytest.mark.asyncio
+async def test_upload_name_of_255_characters_is_accepted(client):
+    # Characters, not bytes: this name is 510 bytes in UTF-8, like files.name VARCHAR(255).
+    name = "ż" * 251 + ".txt"
+    r = await upload(client, name, b"x", "text/plain")
+    assert r.status_code == 201, r.text
+    assert r.json()["name"] == name
+
+
+@pytest.mark.asyncio
+async def test_upload_name_over_255_characters(client, db):
+    r = await upload(client, "a" * 252 + ".txt", b"x", "text/plain")
+    error = assert_error(r, 400, "VALIDATION_ERROR")
+    assert [d["field"] for d in error["details"]] == ["file"]
+    assert await storage.list_blobs() == []
+    assert count(db, "files") == 0
+
+
+@pytest.mark.asyncio
 async def test_upload_exactly_at_limit_is_accepted(make_client):
     async with make_client(max_upload_mb=1) as client:
         r = await upload(client, data=os.urandom(MIB))
@@ -234,6 +252,21 @@ async def test_download_non_ascii_name(client):
     disposition = r.headers["content-disposition"]
     assert disposition.startswith("attachment;")
     assert f"filename*=UTF-8''{quote(name)}" in disposition
+
+
+@pytest.mark.asyncio
+async def test_download_name_cannot_break_the_header(client, db):
+    # Written straight to the database: multipart parsers already mangle some of these.
+    name = 'a"b\\c\r\nSet-Cookie: x=1;ż.txt'
+    f = (await upload(client)).json()
+    db("UPDATE files SET name = :name WHERE id = :id", name=name, id=f["id"])
+    r = await client.get(f"/api/files/{f['id']}/download")
+    assert r.status_code == 200
+    assert r.headers["content-disposition"] == (
+        'attachment; filename="a_b_c__Set-Cookie: x=1;_.txt"; '
+        "filename*=UTF-8''a%22b%5Cc%0D%0ASet-Cookie%3A%20x%3D1%3B%C5%BC.txt"
+    )
+    assert "set-cookie" not in r.headers
 
 
 @pytest.mark.asyncio

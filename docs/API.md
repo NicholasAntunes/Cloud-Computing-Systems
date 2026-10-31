@@ -12,8 +12,9 @@
 | Dates | ISO 8601 in UTC with `Z`, to the second, e.g. `"2026-11-02T14:05:31Z"` |
 | IDs | Files: UUID string. Users: integer |
 | Sizes | Bytes, as integers (`size_bytes`) |
-| Auth (from Phase 2) | `Authorization: Bearer <access_token>` on every request except login and refresh |
+| Auth (from Phase 2) | `Authorization: Bearer <access_token>` on every request except login, refresh and the health check |
 | Live spec | Swagger UI at `https://localhost/api/docs` once the API runs |
+| Health check | `GET /api/health` → `200 {"status": "ok"}`, no token. It only shows the API process is up; it doesn't check the database or storage |
 
 ## Objects
 
@@ -82,7 +83,7 @@ Returned by login, refresh and `GET /api/auth/me`.
 
 ### List — `GET /api/files?limit=100&offset=0`
 
-Returns only files the user may read, newest `updated_at` first. `limit` defaults to 100 and must be 1–1000; `offset` defaults to 0. Out of range → `400` `VALIDATION_ERROR`.
+Returns only files the user may read, newest `updated_at` first. `limit` defaults to 100 and must be 1–1000; `offset` defaults to 0. Out of range or not a number → `400` `VALIDATION_ERROR`.
 
 ```json
 200 OK
@@ -103,16 +104,20 @@ await apiFetch('/api/files', { method: 'POST', body: form });
 |---|---|
 | Success | `201 Created`, body: File (with `current_version: 1`) |
 | No `file` field / empty file / file name empty or over 255 characters | `400` `VALIDATION_ERROR` |
-| Over 100 MB | `413` `FILE_TOO_LARGE` |
+| Over 100 MB (`MAX_UPLOAD_MB`; 1 MB = 1024 × 1024 bytes) | `413` `FILE_TOO_LARGE` |
 | No WRITE right (Phase 2) | `403` `FORBIDDEN` |
 
-`fetch` has no upload progress; use `XMLHttpRequest` (`xhr.upload.onprogress`) if you want a progress bar. Check the size on the client too, so users don't wait to be told 413.
+- Any file type is accepted. `content_type` is the type the browser sends with the file, or `application/octet-stream` if it is missing or not a valid header value.
+- Uploading a name that already exists creates a **new, separate file** with a new `id`. New versions of a file come in Phase 5 (`POST /api/files/{id}/versions`).
+
+`fetch` has no upload progress; use `XMLHttpRequest` (`xhr.upload.onprogress`) if you want a progress bar. Check the size on the client too (`file.size > 100 * 1024 * 1024`), so users don't wait to be told 413.
 
 ### Download — `GET /api/files/{id}/download[?version=n]`
 
 **Direct stream** from the API, not a temporary URL. Reasons: Azurite doesn't support user-delegation SAS, files must only be reachable through the API (NFR7), and every download must be written to the LogBook.
 
-- Response: the file bytes with `Content-Type` and `Content-Disposition: attachment; filename="holiday.jpg"` (UTF-8 names via `filename*=`).
+- Response: the file bytes with `Content-Type`, `Content-Length` (usable for a progress bar), `Content-Disposition: attachment; filename="holiday.jpg"` and `X-Content-Type-Options: nosniff`. Always an attachment, whatever the type, so the browser saves the file and never renders it.
+- `filename` is an ASCII fallback (other characters, `"` and `\` become `_`); the exact name is in `filename*=UTF-8''…` and in the File's `name`.
 - Without `version` you get the current version.
 - Unknown or deleted file, or no such version → `404` `NOT_FOUND`. `version` below 1 or not a number → `400` `VALIDATION_ERROR`.
 - From Phase 2 a plain `<a href>` can't send the Bearer header, so download with `fetch` → `blob()` → object URL:
@@ -129,7 +134,7 @@ Build it this way from Phase 1 so nothing changes later.
 
 ### File detail — `GET /api/files/{id}`
 
-`200` File. Used to refresh one row after an action.
+`200` File. Used to refresh one row after an action. Unknown, deleted or malformed ID → `404` `NOT_FOUND`.
 
 ## Authentication (Phase 2)
 

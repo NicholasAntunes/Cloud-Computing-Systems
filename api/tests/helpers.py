@@ -21,7 +21,8 @@ ADMIN_USERNAME = "admin"
 ADMIN_EMAIL = "admin@example.com"
 ADMIN_PASSWORD = "test-admin-password"
 
-ISO_UTC = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$")
+# API.md "Dates": UTC, whole seconds, Z. No fractional seconds, no +00:00.
+ISO_UTC = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 
 
 def make_settings(**overrides: Any):
