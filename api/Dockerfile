@@ -24,7 +24,9 @@ USER app
 
 EXPOSE 8000
 
-# Serve. --proxy-headers: take the client address from Caddy's X-Forwarded-For,
-# trusted only from the IPs in FORWARDED_ALLOW_IPS (default 127.0.0.1).
-# TODO(task 3): run `alembic upgrade head &&` first once migrations exist.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
+# Migrate, then serve. A failed migration stops the container instead of serving
+# with the wrong schema; `exec` makes uvicorn PID 1, so `docker stop` (SIGTERM)
+# reaches it and it shuts down cleanly. --proxy-headers: take the client address
+# from Caddy's X-Forwarded-For, trusted only from the IPs in FORWARDED_ALLOW_IPS
+# (default 127.0.0.1).
+CMD ["sh", "-c", "alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers"]
