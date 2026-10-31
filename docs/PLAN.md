@@ -173,7 +173,7 @@ logbook          (id, ts, user_id, username, action, file_id, version_no,
 | GET | `/api/logbook/export?format=csv\|json` | admin | — |
 | POST | `/api/users` | admin | `USER_CREATE` |
 
-FastAPI generates the OpenAPI spec and a Swagger UI at `/docs`. We use them for testing and demos.
+FastAPI generates the OpenAPI spec and a Swagger UI at `/api/docs`. We use them for testing and demos.
 
 ## 8. Repository layout (target)
 
@@ -465,7 +465,7 @@ Phase 2+ continues with the same split: A leads Phase 2 (auth), B leads Phases 3
 
 ## 15. Open decisions
 
-- [ ] Backend language: FastAPI (default) vs Node.js or .NET. The repo's `.gitignore` is the Node template; confirm the choice.
+- [x] Backend language: FastAPI (decided 30 Oct).
 - [ ] Presentation dates and lengths
 - [ ] Which report template the supervisor expects
 - [ ] Self-registration vs admin-created accounts (default: admin-created)
