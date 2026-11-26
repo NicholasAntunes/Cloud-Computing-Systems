@@ -35,15 +35,17 @@ Also on you: fill in the team names, supervisor and date on the slides and in bo
 
 In Q&A, take questions on: authentication, JWT and logout, rights, password hashing, OWASP, the API design.
 
-## After the presentation
+## After presentation 1
 
-| Phase | Your part |
+Dates, the day-1 agreements and the full checklist: [PLAN §10](../PLAN.md#10-schedule).
+
+| When | Your part |
 |---|---|
-| 2 — Auth & authorization (lead) | `users` table + Alembic; Argon2id hashing; login, access + refresh tokens, refresh endpoint; logout revokes the refresh token; roles + `file_permissions`; one `require(right)` dependency on every endpoint; admin create / deactivate users; login rate limiting; tests for every role × operation, ID guessing, expired / revoked tokens |
-| 3 — LogBook | Call B's `log_event()` from every auth endpoint (`LOGIN`, `LOGIN_FAILED`, `LOGOUT`, `USER_CREATE`) |
-| 5 — Version control | Rights checks (`READ` / `UPDATE`) on B's version endpoints |
-| 6 — Hardening (lead on security) | Security review against OWASP ASVS: HSTS and security headers, CORS limited to our origin, generic error messages, `pip-audit` |
-| 7 — Report | Security chapter |
+| Until presentation 2 (Mon 30 Nov) | Write the day-1 agreements into `API.md`; first pull request: login, access + refresh tokens, refresh, logout (revokes the refresh token), `GET /api/auth/me`, `current_user` reads the Bearer token; your slides |
+| Until Sun 6 Dec — users, rights & LogBook | Roles + `file_permissions`; one `require(right)` dependency on every endpoint; login rate limiting from recent `LOGIN_FAILED` LogBook entries; call B's `log_event()` from the auth and file endpoints; sharing *(cut if late)*; tests for every role × operation, ID guessing, expired / revoked tokens |
+| W9–W10 (7–20 Dec) | `READ` / `UPDATE` checks on B's version endpoints; security headers (HSTS, `nosniff`, `frame-ancestors`) set in the API, since there's no Caddy on Azure; CORS limited to our web origin; with **D**, login and refresh working on Azure |
+| W11 (4–10 Jan) | Generic error messages (no stack traces); check the Azure deployment: HTTP refused or redirected, storage not public; your slides for presentation 3 |
+| After presentation 3 (11–25 Jan) — security review (lead) | Review against OWASP ASVS; `pip-audit`; report: security chapter |
 
 ## Works with
 

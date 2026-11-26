@@ -32,15 +32,17 @@ Total 4:30, the longest part. You take over from **D** after the demo and hand o
 
 In Q&A, take questions on: competing products, why we chose these three, the user interface, device support.
 
-## After the presentation
+## After presentation 1
 
-| Phase | Your part |
+Dates, the day-1 agreements and the full checklist: [PLAN §10](../PLAN.md#10-schedule).
+
+| When | Your part |
 |---|---|
-| 2 — Auth & authorization | Login page, logout button, token handling (refresh cookie + access token), hide actions the user has no right to, share dialog |
-| 3 — LogBook | Admin LogBook page with filters and CSV / JSON export buttons |
-| 5 — Version control | Version history panel (version, date, size, uploader) with Download and Restore |
-| 6 — Hardening | Device testing on computer, tablet and smartphone for all six functions; `npm audit` |
-| 7 — Report | User guide with screenshots (collect them after every feature); final presentation deck |
+| Until presentation 2 (Mon 30 Nov) | Login page and logout button (against `API.md` until A's pull request lands); presentation 2 deck |
+| Until Sun 6 Dec — users, rights & LogBook | Token handling (refresh cookie + access token, `apiFetch` in `API.md`); hide actions the user has no right to; admin pages for users (create / deactivate) and the LogBook (filters, CSV / JSON export buttons); share dialog *(cut if late)* |
+| W9–W10 (7–20 Dec) | Version history panel (version, date, size, uploader) with Download and Restore |
+| W11 (4–10 Jan) | Device testing on Azure: computer, tablet and smartphone, all six functions; presentation 3 deck |
+| After presentation 3 (11–25 Jan) | `npm audit`; user guide with screenshots (collect them after every feature) |
 
 ## Works with
 
@@ -48,6 +50,6 @@ For Vite development behind Caddy, configure the dev server to accept external
 hosts: `server: { host: '0.0.0.0', port: 5173, allowedHosts: true }`.
 
 - **A:** API contract, login and token flow.
-- **B:** version history and LogBook endpoints.
+- **B:** version history, LogBook and user admin endpoints.
 - **D:** web container, Caddy routing, Static Web Apps deployment.
 - Review **D**'s pull requests.

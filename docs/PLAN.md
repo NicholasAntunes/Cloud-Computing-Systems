@@ -1,6 +1,6 @@
 # Development Plan — Cloud File Exchange System
 
-> How we build the system: architecture, requirements, data model, API, phases and Azure migration.
+> How we build the system: architecture, requirements, data model, API, schedule and Azure migration.
 > Presentation content: [PRESENTATION.md](PRESENTATION.md)
 
 ## 1. Goal
@@ -15,20 +15,20 @@ A system for exchanging documents and photos between client devices (computer, t
 
 ### Functional
 
-| ID | Requirement | Requirement level | Phase |
+| ID | Requirement | Requirement level | Ready by |
 |---|---|---|---|
-| FR1 | Login | Good grade | 2 |
-| FR2 | Logout (session really ends: refresh token revoked) | Good grade | 2 |
-| FR3 | Upload file | Necessary | 1 |
-| FR4 | Download file | Necessary | 1 |
-| FR5 | List files the user can read | Necessary | 1 |
-| FR6 | Authorization: **read / write / update** rights | Good grade | 2 |
-| FR7 | Version control: each version has a number, date and size; list versions | Very good grade | 5 |
-| FR8 | Download a specific version; restore an older version | Very good grade | 5 |
-| FR9 | LogBook: every login (success and failure), logout and file operation recorded in a database | LogBook (perfect) | 3 |
-| FR10 | LogBook export to CSV / JSON; admin view with filters | LogBook (essential) | 3 |
-| FR11 | Admin creates / deactivates users | Good grade | 2 |
-| FR12 | Owner shares a file with another user (read or update) | Should | 2 |
+| FR1 | Login | Good grade | 6 Dec |
+| FR2 | Logout (session really ends: refresh token revoked) | Good grade | 6 Dec |
+| FR3 | Upload file | Necessary | Presentation 1 |
+| FR4 | Download file | Necessary | Presentation 1 |
+| FR5 | List files the user can read | Necessary | Presentation 1 |
+| FR6 | Authorization: **read / write / update** rights | Good grade | 6 Dec |
+| FR7 | Version control: each version has a number, date and size; list versions | Very good grade | 20 Dec |
+| FR8 | Download a specific version; restore an older version | Very good grade | 20 Dec |
+| FR9 | LogBook: every login (success and failure), logout and file operation recorded in a database | LogBook (perfect) | 6 Dec |
+| FR10 | LogBook export to CSV / JSON; admin view with filters | LogBook (essential) | 6 Dec |
+| FR11 | Admin creates / deactivates users | Good grade | 6 Dec |
+| FR12 | Owner shares a file with another user (read or update) | Should | 6 Dec (cut if late) |
 
 ### Non-functional
 
@@ -290,94 +290,146 @@ The rest of the code never knows which one it's using.
 - To test from a phone or tablet, use the machine's LAN hostname instead of `localhost`, and install Caddy's root certificate on the device. Alternatively, test devices against the Azure deployment.
 - Neither Uvicorn nor Caddy limits upload size by default, so the API must enforce `MAX_UPLOAD_MB` while streaming.
 
-## 10. Phases
+## 10. Schedule
 
-Draft dates assume W1 starts **Mon 26 Oct 2026**. Align them with the course calendar and the presentation dates.
+The work is organised around the course milestones:
+
+| Week | Starts | Milestone |
+|---|---|---|
+| W5 | Mon 2 Nov | **Presentation 1**: idea, plan and first demo (done) |
+| W8 | Mon 30 Nov | **Presentation 2**: progress |
+| W12 | Mon 11 Jan | **Presentation 3**: final demo of the finished system on Azure |
+| W14 | Mon 25 Jan | **Hand-in**: final report and code |
+
+Course weeks after W8: W9 = 7 Dec, W10 = 14 Dec, Christmas break 21 Dec – 3 Jan, W11 = 4 Jan, W12 = 11 Jan, W13 = 18 Jan, W14 = 25 Jan.
+
+> Older documents and code comments still say "Phase n": 0 = setup, 1 = first working version, 2 and 3 = users, rights & LogBook, 4 = trial Azure deployment, 5 = version control, 6 = final Azure deployment & hardening, 7 = report.
 
 ```mermaid
 gantt
   dateFormat YYYY-MM-DD
   axisFormat %d %b
   section Build
-  0 Setup                        :p0, 2026-10-26, 7d
-  1 First working version        :p1, 2026-11-02, 14d
-  2 Auth & authorization         :p2, 2026-11-09, 21d
-  3 LogBook                      :p3, 2026-11-23, 14d
-  4 Trial Azure deployment       :p4, 2026-11-30, 14d
-  5 Version control              :p5, 2026-12-07, 14d
-  Holiday buffer                 :crit, 2026-12-21, 14d
-  6 Migration & hardening        :p6, 2027-01-04, 14d
-  7 Documentation                :p7, 2027-01-18, 7d
+  Setup & first version          :done, s1, 2026-10-26, 2026-11-02
+  Users, rights & LogBook        :s2, 2026-11-26, 2026-12-07
+  Version control                :s3, 2026-12-07, 2026-12-21
+  Trial Azure deployment         :s4, 2026-12-07, 2026-12-21
+  Christmas break (buffer)       :crit, s5, 2026-12-21, 2027-01-04
+  Final Azure deployment         :s6, 2027-01-04, 2027-01-11
+  Hardening, testing & report    :s7, 2027-01-11, 2027-01-25
   section Milestones
-  First presentation (TBD)       :milestone, m1, 2026-11-13, 0d
-  Feature freeze                 :milestone, m2, 2027-01-10, 0d
-  Final presentation (TBD)       :milestone, m3, 2027-01-24, 0d
+  Presentation 1 (W5)            :milestone, m1, 2026-11-02, 0d
+  Presentation 2 (W8)            :milestone, m2, 2026-11-30, 0d
+  Feature freeze                 :milestone, m3, 2027-01-03, 0d
+  Presentation 3 (W12)           :milestone, m4, 2027-01-11, 0d
+  Hand-in (W14)                  :milestone, m5, 2027-01-25, 0d
 ```
 
-### Phase 0 — Setup (W1)
-- [ ] Agree on the stack (default: FastAPI + React + PostgreSQL) and team roles
-- [ ] Repo: protected `main`, feature branches, pull requests with one reviewer
-- [ ] GitHub Projects board with one issue per task below
-- [ ] `docker-compose.yml`, `.env.example`, `Caddyfile`; fix `.gitignore`
-- [ ] GitHub Actions: lint + tests, with PostgreSQL and Azurite as service containers
-- [ ] Azure for Students subscription + budget alert
-- [ ] Azure Storage Explorer installed and connected to Azurite
+### Up to presentation 1 (W5, 2 Nov) — done
 
-### Phase 1 — First working version (W2–W3) · Necessary
-- [ ] `app/storage`: create container, upload (streamed), download (streamed), list
-- [ ] `POST /api/files`, `GET /api/files`, `GET /api/files/{id}/download`
-- [ ] Minimal web page: file list, upload button, download links
-- [ ] Everything reachable only via `https://localhost`
-- [ ] **Demo ready for the first presentation**
+Setup and the first working version: upload → list → download over `https://localhost`.
 
-### Phase 2 — Authentication & authorization (W3–W5) · Good grade
-- [ ] `users` table, Alembic migrations, seed admin from environment variables
-- [ ] Argon2id hashing (`argon2-cffi`), login, access + refresh tokens, refresh endpoint
-- [ ] Logout revokes the refresh token
-- [ ] Roles + `file_permissions`; `require(right)` dependency on every endpoint
-- [ ] Admin endpoints: create / deactivate users
-- [ ] Login rate limiting
-- [ ] Web: login page, logout button, token handling, hide actions the user has no right to
+- [x] Stack (FastAPI + React + PostgreSQL) and team roles agreed
+- [x] `docker-compose.yml`, `.env.example`, `Caddyfile`; `.gitignore` fixed
+- [x] GitHub Actions: lint + tests, with PostgreSQL and Azurite as service containers
+- [x] `app/storage`: create container, streamed upload and download, list
+- [x] `users`, `files` and `file_versions` tables with Alembic; admin seeded from environment variables; Argon2id hashing; upload writes version 1
+- [x] `POST /api/files`, `GET /api/files`, `GET /api/files/{id}`, `GET /api/files/{id}/download`
+- [x] Web page: file list, upload button, download links; served over `https://localhost` through Caddy
+- [ ] Not confirmed yet (tick when done): protected `main`; GitHub Projects board; Azure for Students subscription + budget alert; Azure Storage Explorer connected to Azurite
+
+### Presentation 1 → 2 (until W8, Mon 30 Nov)
+
+Presentation 2 shows the progress since presentation 1: what works, what changed in the plan, and the road to the final demo. Anything not ready by Monday moves into the next block; the demo shows what works.
+
+**Day 1 — agree before coding** (A writes it into [API.md](API.md)):
+- [ ] `log_event()` signature. Failure entries are committed in their own session, so a rollback can't erase them
+- [ ] Auth dependencies the others build on: `current_user`, `require(right)`, `require_admin`. The current `current_user` already returns the admin, so B and C can start against it
+- [ ] LogBook entry JSON shape and CSV columns; `USER_DEACTIVATE` action; endpoints to list and deactivate users
+- [ ] Migration order: A's migration (`refresh_tokens`, `file_permissions`) merges first and B's `down_revision` points to it. Two migrations made from the same head give Alembic two heads, and the API container fails to start
+
+**Work:**
+- [ ] **A:** first pull request: login, access + refresh tokens (refresh tokens stored hashed in `refresh_tokens`), refresh, logout (revokes the refresh token), `GET /api/auth/me`; `current_user` reads the Bearer token
+- [ ] **B:** `logbook` table and `log_event()` service; record client IP and user agent; record failures too (`success = false`)
+- [ ] **C:** login page and logout button, against `API.md` until A's pull request lands
+- [ ] **D:** new settings (`JWT_SECRET`, …) in `.env.example`, Compose and CI. Real client IP in the LogBook: set `FORWARDED_ALLOW_IPS` so uvicorn trusts only Caddy (unset, every entry gets Caddy's address), and stop publishing the API's port 8000 on the host so the API is reachable only through Caddy over HTTPS
+- [ ] **All:** progress slides; live demo of what works with a backup recording (D); timed run-through on Sunday
+
+### Presentation 2 → 3 (W8–W12, 30 Nov – 11 Jan)
+
+Goal: every feature finished and running on Azure, demoed on a computer, a tablet and a smartphone.
+
+#### Users, rights & LogBook (until Sun 6 Dec) · Good grade + LogBook
+
+Authentication and the LogBook are built together, so all four roles work in parallel: the LogBook needs real users anyway (`user_id`, login entries, admin-only endpoints).
+
+**A — authentication & rights**
+- [ ] Roles + `file_permissions`; `require(right)` dependency on every endpoint; the file list shows only readable files
+- [ ] Login rate limiting from the LogBook: recent `LOGIN_FAILED` entries per username and per IP → `429`. No extra store, and it works with several API replicas on Azure
+- [ ] `log_event()` calls in the auth and file endpoints
+- [ ] Sharing: `PUT /api/files/{id}/permissions` *(cut if late)*
 - [ ] Tests: role × operation matrix, ID-guessing attempts, expired / revoked tokens
 
-### Phase 3 — LogBook (W5–W6)
-- [ ] `logbook` table and `log_event()` service, called from the auth and file services
-- [ ] Record client IP and user agent; record failures too (`success = false`)
+**B — LogBook & user administration**
 - [ ] `GET /api/logbook` with filters and pagination (admin only)
-- [ ] CSV and JSON export
-- [ ] Web: admin LogBook page
+- [ ] CSV and JSON export; CSV cells starting with `=`, `+`, `-` or `@` get a leading `'` (formula injection)
+- [ ] Admin endpoints: create / list / deactivate users; deactivating also revokes the user's refresh tokens
 - [ ] Test: scripted scenario of N operations → exactly N entries
 
-### Phase 4 — Trial Azure deployment (W6–W7)
-- [ ] Deploy the current state with the steps in §11
+**C — web**
+- [ ] Token handling (`apiFetch` in [API.md](API.md)); hide actions the user has no right to
+- [ ] Admin pages: users (create / deactivate) and LogBook (filters, CSV / JSON export)
+- [ ] Share dialog *(cut if late)*
+
+**D — infrastructure**
+- [ ] Check the refresh cookie (`Secure; SameSite=Strict; Path=/api/auth`) works through Caddy on `https://localhost`
+- [ ] Extend `scripts/smoke_test.sh`: login → upload → download → logout → check the LogBook entry count
+- [ ] Azure for Students subscription + budget alert, if not done yet
+
+#### Version control + trial Azure deployment (W9–W10, 7–20 Dec) · Very good grade
+
+**B (lead) — version control**
+- [ ] `POST /api/files/{id}/versions` (new version), with `SELECT … FOR UPDATE` + retry on conflict against simultaneous uploads
+- [ ] SHA-256 computed while streaming
+- [ ] `GET /api/files/{id}/versions`; download by version; restore (copy to a new version)
+- [ ] Tests: 3 uploads → versions 1–3 with correct sizes; v1 hash matches the original; parallel uploads get unique numbers
+
+**A**
+- [ ] `READ` / `UPDATE` checks on B's version endpoints
+- [ ] Security headers (HSTS, `nosniff`, `frame-ancestors`) set in the API, because on Azure there is no Caddy in front of it; CORS limited to our web origin
+- [ ] With D: login and refresh working on Azure (see the risk below)
+
+**C**
+- [ ] Version history panel (version, date, size, uploader) with Download and Restore
+
+**D (lead) — trial Azure deployment**
+- [ ] Deploy the 6 Dec state with the steps in §11
 - [ ] Note every local/cloud difference found, and fix it in code or config
 - [ ] Scale to zero / stop the database afterwards to save credit
 
-### Phase 5 — Version control (W7–W9) · Very good grade
-- [ ] `file_versions` table; upload writes version 1
-- [ ] `POST /api/files/{id}/versions` (new version), with locking against simultaneous uploads
-- [ ] SHA-256 computed while streaming
-- [ ] `GET /api/files/{id}/versions`; download by version; restore (copy to a new version)
-- [ ] Web: version history panel (version, date, size, uploader) with Download / Restore buttons
-- [ ] Tests: 3 uploads → versions 1–3 with correct sizes; v1 hash matches the original; parallel uploads get unique numbers
+> **Risk: the refresh cookie on Azure.** Locally, Caddy serves the web app and the API from one origin. On Azure, Static Web Apps (`*.azurestaticapps.net`) and Container Apps (`*.azurecontainerapps.io`) are different sites, so the browser won't send the `SameSite=Strict` refresh cookie to the API. Options: serve the web build from the same Container Apps origin as the API, put both on one custom domain, or use a Static Web Apps linked backend (Standard plan, not free). Decide during the trial deployment.
 
-### Phase 6 — Final migration & hardening (W10–W11)
-- [ ] Repeatable deployment script in `infra/`
-- [ ] Managed identity for Blob access; secrets in Key Vault; Application Insights
-- [ ] Security review against an OWASP ASVS checklist:
-  - [ ] HSTS and security headers
-  - [ ] CORS restricted to our origin
-  - [ ] Generic error messages (no stack traces to clients)
-  - [ ] Dependency audit
-- [ ] Device testing: computer, tablet, smartphone (all six functions)
-- [ ] Load check: 100 MB upload; list of 1,000 files
-- [ ] Verify every measure of success (§13)
+#### Christmas break (21 Dec – 3 Jan)
 
-### Phase 7 — Documentation (W12)
-- [ ] Final report (12–18 pages, outline in `Reportclasses.pdf`); ask the supervisor whether the older lab template applies too (cloud provider, security aspects, user guide, team roles)
-- [ ] User guide with screenshots (collect them throughout the project)
-- [ ] Final presentation + backup demo video
-- [ ] Delete or scale down Azure resources after grading
+Buffer: nothing new is planned; finish whatever slipped. **Feature freeze on Sun 3 Jan**: after it, only fixes, deployment and testing.
+
+#### Final Azure deployment (W11, 4–10 Jan)
+
+- [ ] **D:** repeatable deployment script in `infra/` (Bicep or az CLI); managed identity for Blob access; secrets in Key Vault; Application Insights; the same scripted smoke test on Azure as locally
+- [ ] **A:** generic error messages (no stack traces to clients); check the deployment: plain HTTP refused or redirected, secure transfer required and public access off on the storage account
+- [ ] **B:** fix storage and versioning issues found on Azure; check the LogBook after the Azure smoke test
+- [ ] **C:** device testing on Azure: computer, tablet, smartphone, all six functions
+- [ ] **All:** presentation 3 slides; dry run of the demo on Azure; backup demo video
+
+### Presentation 3 → hand-in (W12–W14, 11–25 Jan)
+
+- [ ] Security review against an OWASP ASVS checklist; `pip-audit` (A) and `npm audit` (C)
+- [ ] Load check: 100 MB upload; list of 1,000 files; cleanup of orphan blobs (B)
+- [ ] Verify every measure of success (§13) and keep the evidence (all)
+- [ ] Final report (12–18 pages, outline in `Reportclasses.pdf`). Chapters 1–3 start from [PRESENTATION.md](PRESENTATION.md); each role writes the chapters listed in its role file (all)
+- [ ] User guide with screenshots (C; collect screenshots after every feature)
+- [ ] Hand in the report and code (W14)
+- [ ] Delete or scale down Azure resources after grading (D)
 
 ## 11. Azure migration steps
 
@@ -454,7 +506,7 @@ The presentation moved up, so Phase 0 and Phase 1 are compressed into one week. 
 | **Slides** | 9–12 | 1–3 | 6–8 + deck assembly | 4–5 (+ live demo), 13–14 |
 | **P−1** | Timed run-through (all) | Timed run-through (all) | Timed run-through (all) | Timed run-through (all); update slide 5 with what actually works |
 
-Phase 2+ continues with the same split: A leads Phase 2 (auth), B leads Phases 3 and 5 (LogBook, versioning), C builds each feature's UI, D leads Phases 4 and 6 (Azure). Every pull request is reviewed by one other member, ideally the one whose work depends on it (A↔B, C↔A, D↔anyone).
+After presentation 1, §10 lists every role's tasks up to presentation 2, presentation 3 and the hand-in; each role file has the same split. B leads version control, C builds each feature's UI, D leads both Azure deployments, A leads the security review. Every pull request is reviewed by one other member, ideally the one whose work depends on it (A↔B, C↔A, D↔anyone).
 
 **Communication:**
 - Weekly meeting (_TBD_ day/time)
@@ -466,7 +518,8 @@ Phase 2+ continues with the same split: A leads Phase 2 (auth), B leads Phases 3
 ## 15. Open decisions
 
 - [x] Backend language: FastAPI (decided 30 Oct).
-- [ ] Presentation dates and lengths
+- [x] Presentation dates: W5 2 Nov, W8 30 Nov, W12 11 Jan; hand-in W14 (see §10)
+- [ ] Presentation lengths
 - [ ] Which report template the supervisor expects
 - [ ] Self-registration vs admin-created accounts (default: admin-created)
 - [ ] Optional: Microsoft Entra ID login instead of our own accounts (stretch goal; can't be emulated locally)
