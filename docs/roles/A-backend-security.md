@@ -41,7 +41,7 @@ Dates, the day-1 agreements and the full checklist: [PLAN §10](../PLAN.md#10-sc
 
 | When | Your part |
 |---|---|
-| Until presentation 2 (Mon 30 Nov) | Write the day-1 agreements into `API.md`; first pull request: login, access + refresh tokens, refresh, logout (revokes the refresh token), `GET /api/auth/me`, `current_user` reads the Bearer token; your slides |
+| Until presentation 2 (Mon 30 Nov) | Write the day-1 agreements into `API.md`; first pull request (by Fri 27 Nov, unblocks **B**): `refresh_tokens` + `file_permissions` migration, dependency stubs, single-head test; second pull request: login, access + refresh tokens, refresh, logout (revokes the refresh token), `GET /api/auth/me`, `current_user` reads the Bearer token; your slides |
 | Until Sun 6 Dec — users, rights & LogBook | Roles + `file_permissions`; one `require(right)` dependency on every endpoint; login rate limiting from recent `LOGIN_FAILED` LogBook entries; call B's `log_event()` from the auth and file endpoints; sharing *(cut if late)*; tests for every role × operation, ID guessing, expired / revoked tokens |
 | W9–W10 (7–20 Dec) | `READ` / `UPDATE` checks on B's version endpoints; security headers (HSTS, `nosniff`, `frame-ancestors`) set in the API, since there's no Caddy on Azure; CORS limited to our web origin; with **D**, login and refresh working on Azure |
 | W11 (4–10 Jan) | Generic error messages (no stack traces); check the Azure deployment: HTTP refused or redirected, storage not public; your slides for presentation 3 |

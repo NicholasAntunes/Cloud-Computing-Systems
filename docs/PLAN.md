@@ -150,7 +150,7 @@ logbook          (id, ts, user_id, username, action, file_id, version_no,
 
 - **Blob naming:** container `files`, blob `{file_id}/{version_no}`. User-supplied file names are **never** used as blob paths, which prevents name collisions and path tricks. The original name is stored in `files.name` and sent back in `Content-Disposition` on download.
 - **Simultaneous uploads:** the next version number is read with `SELECT … FOR UPDATE` on the `files` row. The `UNIQUE (file_id, version_no)` constraint is the safety net; on conflict, retry.
-- **LogBook actions:** `LOGIN`, `LOGIN_FAILED`, `LOGOUT`, `LIST`, `UPLOAD`, `UPDATE` (new version), `DOWNLOAD`, `RESTORE`, `SHARE`, `DELETE`, `USER_CREATE`.
+- **LogBook actions:** `LOGIN`, `LOGIN_FAILED`, `LOGOUT`, `LIST`, `UPLOAD`, `UPDATE` (new version), `DOWNLOAD`, `RESTORE`, `SHARE`, `DELETE`, `USER_CREATE`, `USER_DEACTIVATE`. Entry shape, CSV columns and the logging rules: [API.md](API.md#logentry).
 
 ## 7. REST API
 
@@ -169,9 +169,11 @@ logbook          (id, ts, user_id, username, action, file_id, version_no,
 | POST | `/api/files/{id}/versions/{n}/restore` | UPDATE | `RESTORE` |
 | PUT | `/api/files/{id}/permissions` | owner | `SHARE` |
 | DELETE | `/api/files/{id}` | owner / admin | `DELETE` (soft delete) |
-| GET | `/api/logbook?user=&action=&from=&to=` | admin | — |
+| GET | `/api/logbook?user=&action=&success=&from=&to=` | admin | — |
 | GET | `/api/logbook/export?format=csv\|json` | admin | — |
+| GET | `/api/users` | admin | — |
 | POST | `/api/users` | admin | `USER_CREATE` |
+| POST | `/api/users/{id}/deactivate` | admin | `USER_DEACTIVATE` |
 
 FastAPI generates the OpenAPI spec and a Swagger UI at `/api/docs`. We use them for testing and demos.
 
@@ -349,7 +351,7 @@ Presentation 2 shows the progress since presentation 1: what works, what changed
 - [ ] Migration order: A's migration (`refresh_tokens`, `file_permissions`) merges first and B's `down_revision` points to it. Two migrations made from the same head give Alembic two heads, and the API container fails to start
 
 **Work:**
-- [ ] **A:** first pull request: login, access + refresh tokens (refresh tokens stored hashed in `refresh_tokens`), refresh, logout (revokes the refresh token), `GET /api/auth/me`; `current_user` reads the Bearer token
+- [ ] **A:** first pull request, merged by Fri 27 Nov: `refresh_tokens` and `file_permissions` tables + migration, stub `require()` / `require_write` / `require_admin`, a test for a single Alembic head ([API.md](API.md#migration-order)). Second pull request: login, access + refresh tokens (refresh tokens stored hashed in `refresh_tokens`), refresh, logout (revokes the refresh token), `GET /api/auth/me`; `current_user` reads the Bearer token
 - [ ] **B:** `logbook` table and `log_event()` service; record client IP and user agent; record failures too (`success = false`)
 - [ ] **C:** login page and logout button, against `API.md` until A's pull request lands
 - [ ] **D:** new settings (`JWT_SECRET`, …) in `.env.example`, Compose and CI. Real client IP in the LogBook: set `FORWARDED_ALLOW_IPS` so uvicorn trusts only Caddy (unset, every entry gets Caddy's address), and stop publishing the API's port 8000 on the host so the API is reachable only through Caddy over HTTPS
