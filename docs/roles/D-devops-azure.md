@@ -36,14 +36,17 @@ Have the demo running **before** the presentation starts. If anything fails, swi
 
 In Q&A, take questions on: Docker, HTTPS, CI, Azure services, cost, the migration plan.
 
-## After the presentation
+## After presentation 1
 
-| Phase | Your part |
+Dates, the day-1 agreements and the full checklist: [PLAN §10](../PLAN.md#10-schedule).
+
+| When | Your part |
 |---|---|
-| 2–3 | Keep Compose and CI working as tables and migrations are added; Alembic migrations run on start-up |
-| 4 — Trial Azure deployment (lead) | Deploy the current state with [PLAN §11](../PLAN.md#11-azure-migration-steps); write down every local / cloud difference; scale to zero and stop PostgreSQL afterwards |
-| 6 — Final migration (lead) | Repeatable script in `infra/` (Bicep or az CLI); managed identity for Blob access; secrets in Key Vault; Application Insights; same scripted smoke test on Azure as locally |
-| 7 — Report | Cloud provider and deployment chapters; delete or scale down Azure resources after grading |
+| Until presentation 2 (Mon 30 Nov) | New settings (`JWT_SECRET`, …) in `.env.example`, Compose and CI; real client IP in the LogBook (`FORWARDED_ALLOW_IPS` trusts only Caddy; API port 8000 no longer published on the host); live demo + backup recording |
+| Until Sun 6 Dec — users, rights & LogBook | Check the refresh cookie works through Caddy on `https://localhost`; extend `scripts/smoke_test.sh` to login → upload → download → logout → LogBook entry count; Azure for Students + budget alert if not done; keep Compose and CI working as migrations are added |
+| W9–W10 (7–20 Dec) — trial Azure deployment (lead) | Deploy the 6 Dec state with [PLAN §11](../PLAN.md#11-azure-migration-steps); write down every local / cloud difference; with **A**, get login and refresh working between the web app and the API on Azure (see the risk in PLAN §10); stop PostgreSQL afterwards |
+| W11 (4–10 Jan) — final deployment (lead) | Repeatable script in `infra/` (Bicep or az CLI); managed identity for Blob access; secrets in Key Vault; Application Insights; same scripted smoke test on Azure as locally; live demo on Azure + backup recording |
+| After presentation 3 (11–25 Jan) | Report: cloud provider and deployment chapters; delete or scale down Azure resources after grading |
 | Ongoing | Watch Azure costs; keep the "who did what" log in `docs/report/` |
 
 ## Works with

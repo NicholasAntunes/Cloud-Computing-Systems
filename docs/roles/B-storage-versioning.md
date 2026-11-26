@@ -33,19 +33,21 @@ Slide 3 points 2 and 3 (version control, Azurite vs Azure) are your design, so e
 
 In Q&A, take questions on: Blob Storage, Azurite, versioning design, simultaneous uploads.
 
-## After the presentation
+## After presentation 1
 
-| Phase | Your part |
+Dates, the day-1 agreements and the full checklist: [PLAN §10](../PLAN.md#10-schedule).
+
+| When | Your part |
 |---|---|
-| 2 — Auth & authorization | Help A with the `file_permissions` table and sharing (FR12) |
-| 3 — LogBook (lead) | `logbook` table and `log_event()` service; record IP, user agent and failures; `GET /api/logbook` with filters and pagination; CSV and JSON export; test: N scripted operations → exactly N entries |
-| 5 — Version control (lead) | `file_versions` table; upload writes version 1; `POST /api/files/{id}/versions` with `SELECT … FOR UPDATE` + retry on conflict; SHA-256 while streaming; list versions, download by version, restore (copy to a new version); tests: 3 uploads → versions 1–3, v1 hash matches, parallel uploads get unique numbers |
-| 6 — Hardening | Load check: 100 MB upload, list of 1,000 files; cleanup of orphan blobs |
-| 7 — Report | Storage, version control and LogBook chapters |
+| Until presentation 2 (Mon 30 Nov) | Day-1 agreements with **A** (`log_event()` signature, LogBook entry shape, migration order); `logbook` table and `log_event()` service, recording IP, user agent and failures (failure entries committed in their own session); your slides |
+| Until Sun 6 Dec — users, rights & LogBook (LogBook lead) | `GET /api/logbook` with filters and pagination; CSV and JSON export, with formula-injection escaping in CSV; admin endpoints to create / list / deactivate users (deactivating revokes the user's refresh tokens); test: N scripted operations → exactly N entries |
+| W9–W10 (7–20 Dec) — version control (lead) | `POST /api/files/{id}/versions` with `SELECT … FOR UPDATE` + retry on conflict; SHA-256 while streaming; list versions, download by version, restore (copy to a new version); tests: 3 uploads → versions 1–3, v1 hash matches, parallel uploads get unique numbers |
+| W11 (4–10 Jan) | Fix storage and versioning issues found on Azure; check the LogBook after the Azure smoke test; your slides for presentation 3 |
+| After presentation 3 (11–25 Jan) | Load check: 100 MB upload, list of 1,000 files; cleanup of orphan blobs; report: storage, version control and LogBook chapters |
 
 ## Works with
 
-- **A:** `app/storage` interface; A's permission dependency on your endpoints.
-- **C:** version history panel and LogBook admin page.
+- **A:** `app/storage` interface; A's permission dependency on your endpoints; A calls your `log_event()`.
+- **C:** version history panel, LogBook and user admin pages.
 - **D:** Azurite in Compose and CI; managed identity and storage account on Azure.
 - Review **A**'s pull requests.
