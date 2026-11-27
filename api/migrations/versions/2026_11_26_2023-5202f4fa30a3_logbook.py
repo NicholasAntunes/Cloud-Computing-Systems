@@ -4,11 +4,10 @@ Revision ID: 5202f4fa30a3
 Revises: 59eb015ba1ea
 Create Date: 2026-11-26 20:23:31.807759
 
-Migration order (docs/API.md "Migration order"): this migration goes on top of
-role A's (``refresh_tokens``, ``file_permissions``). TODO before the pull
-request: merge ``main`` once A's pull request is in, and set ``down_revision``
-below to A's revision ID. ``alembic heads`` must then print one line; with two
-heads the API container fails at startup.
+Migration order (docs/API.md "Migration order"): this one went in before role
+A's (``refresh_tokens``, ``file_permissions``), whose ``down_revision`` is this
+revision, ``5202f4fa30a3``. ``alembic heads`` must print one line; with two heads
+the API container fails at startup.
 """
 
 from collections.abc import Sequence
@@ -19,7 +18,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision: str = "5202f4fa30a3"
-down_revision: str | Sequence[str] | None = "59eb015ba1ea"  # TODO: A's revision ID
+down_revision: str | Sequence[str] | None = "59eb015ba1ea"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
