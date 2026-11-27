@@ -434,6 +434,11 @@ async def log_failure(
 def logged(action: Action) -> params.Depends:
     """Route dependency that records the route's action in ``request.state``,
     so the error handlers know which failure to write."""
+
+
+def logged_action(request: Request) -> Action | None:
+    """The action ``logged`` recorded for this request, or None. The error
+    handlers read it here instead of from request.state directly."""
 ```
 
 - **Successes go into the caller's transaction**, next to the change they record: `UPLOAD` with the `files` + `file_versions` insert, `LOGIN` with the new refresh token, `USER_DEACTIVATE` with the update. If that transaction rolls back, the entry goes with it, so the LogBook never says "uploaded" for an upload that didn't happen. If the LogBook insert fails, the operation fails too: nothing happens without its entry.

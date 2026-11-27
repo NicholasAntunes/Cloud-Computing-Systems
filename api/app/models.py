@@ -1,7 +1,7 @@
 """Database tables (SQLAlchemy 2), see docs/PLAN.md §6.
 
-Phase 1 tables: ``users``, ``files`` and ``file_versions``. ``file_permissions``,
-``refresh_tokens`` and ``logbook`` come in Phases 2–3.
+Tables so far: ``users``, ``files``, ``file_versions`` and ``logbook``.
+``file_permissions`` and ``refresh_tokens`` come with authentication (role A).
 
 Every timestamp is ``timestamptz`` set by PostgreSQL (``now()``), so all rows share
 one clock; ``app.db`` makes the connection return them in UTC. The schema itself
@@ -13,17 +13,20 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
+from typing import Any
 
 from sqlalchemy import (
     BigInteger,
     CheckConstraint,
     DateTime,
     ForeignKey,
+    Index,
     MetaData,
     String,
     UniqueConstraint,
     func,
 )
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 ROLES = ("viewer", "user", "admin")
@@ -110,3 +113,41 @@ class FileVersion(Base):
     uploaded_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
+
+
+class LogEntry(Base):
+    """One LogBook entry: a login, a logout or a file operation (docs/API.md "LogEntry").
+
+    Written only by ``app.logbook`` (``log_event`` / ``log_failure``); rows are never
+    changed or removed. ``username`` is copied from the user at that moment. For a
+    ``LOGIN_FAILED`` with an unknown name it is the name that was typed, and
+    ``user_id`` is NULL.
+
+    No foreign keys on purpose (docs/API.md "Migration order"): the LogBook records
+    attempts on files and users that may not exist, e.g. a download of a guessed
+    ID, and writing an entry must never fail because of that. ``action`` has no
+    CHECK constraint, so adding an action to ``app.logbook.Action`` needs no
+    migration.
+    """
+
+    __tablename__ = "logbook"
+    __table_args__ = (
+        # A's login rate limit: recent LOGIN_FAILED entries per username and per IP.
+        Index("ix_logbook_username_action_ts", "username", "action", "ts"),
+        Index("ix_logbook_ip_action_ts", "ip", "action", "ts"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    # Indexed: the admin view sorts and filters by time.
+    ts: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), index=True
+    )
+    user_id: Mapped[int | None]
+    username: Mapped[str | None] = mapped_column(String(50))
+    action: Mapped[str] = mapped_column(String(20))
+    file_id: Mapped[uuid.UUID | None]
+    version_no: Mapped[int | None]
+    ip: Mapped[str | None] = mapped_column(String(45))  # the longest IPv6 text is 45
+    user_agent: Mapped[str | None] = mapped_column(String(512))
+    success: Mapped[bool]
+    details: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
