@@ -434,6 +434,11 @@ async def log_failure(
 def logged(action: Action) -> params.Depends:
     """Route dependency that records the route's action in ``request.state``,
     so the error handlers know which failure to write."""
+
+
+def logged_action(request: Request) -> Action | None:
+    """The action ``logged`` recorded for this request, or None. The error
+    handlers read it here instead of from request.state directly."""
 ```
 
 - **Successes go into the caller's transaction**, next to the change they record: `UPLOAD` with the `files` + `file_versions` insert, `LOGIN` with the new refresh token, `USER_DEACTIVATE` with the update. If that transaction rolls back, the entry goes with it, so the LogBook never says "uploaded" for an upload that didn't happen. If the LogBook insert fails, the operation fails too: nothing happens without its entry.
@@ -494,12 +499,12 @@ async def new_version(
 
 ```
 59eb015ba1ea  users, files, file_versions       on main
-  └─ A        refresh_tokens, file_permissions  A's first PR, merged by Fri 27 Nov
-       └─ B   logbook                           down_revision = A's revision ID
+  └─ B        logbook (5202f4fa30a3)            on main, went first
+       └─ A   refresh_tokens, file_permissions  down_revision = "5202f4fa30a3"
 ```
 
-- A's first pull request holds only the two tables, their migration, the dependency stubs above and a test that Alembic has exactly one head. Login and tokens follow in a second pull request, so B doesn't wait for them.
-- B sets `down_revision` to the revision ID from A's pull request and merges `main` before opening the LogBook pull request.
+- A's first pull request holds only the two tables, their migration, the dependency stubs above and a test that Alembic has exactly one head. Login and tokens follow in a second pull request.
+- B's LogBook went first (it has no foreign keys, so it doesn't need A's tables). A sets `down_revision` to `5202f4fa30a3` and merges `main` before merging.
 - Why the test: the tests build the schema from `Base.metadata`, not from the migrations. Without it, two heads would pass CI and only break when the API container runs `alembic upgrade head` at startup.
 - For every later migration: merge `main` first; `alembic heads` must print one line.
 
